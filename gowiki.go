@@ -7,6 +7,15 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
+)
+
+// show articles with this languages:
+var (
+	languages = map[string]string {
+		"russian": "ru",
+		"english": "en",
+	}
 )
 
 type Page struct {
@@ -34,9 +43,16 @@ func main() {
 		fmt.Println("Wrong request. Exiting")
 		return
 	}
-	t := args[0]
+	t := strings.Title(strings.Join(args," "))
+	for language := range languages {
+		query(t, languages[language], language)
+	}
+}
+
+func query(t string, lang string, language string) {
+	getreq := "https://" + lang + ".wikipedia.org/w/api.php"
 	client := http.DefaultClient
-	req, err := http.NewRequest("GET", "https://en.wikipedia.org/w/api.php", nil)
+	req, err := http.NewRequest("GET", getreq, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +60,9 @@ func main() {
 	q.Add("format", "json")
 	q.Add("action", "query")
 	q.Add("prop", "extracts")
-	q.Add("exintro", "1")
+	//q.Add("exintro", "1")
+	// for extracting "may refer to..." pages:
+	q.Add("exsentences", "10")
 	q.Add("explaintext", "1")
 	q.Add("redirects", "1")
 	q.Add("titles", t)
@@ -67,7 +85,10 @@ func main() {
 		log.Fatal(err)
 	}
 	for _, val := range jr.Query.Pages {
-		fmt.Println(val.Extract)
+		if val.Extract != "" {
+			fmt.Println("\x1b[31;1m" + val.Title + "\x1b[0m:", val.Extract)
+		} else {
+			fmt.Println(language, "article '" + val.Title + "' not found")
+		}
 	}
-
 }
