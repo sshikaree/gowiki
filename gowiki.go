@@ -46,6 +46,7 @@ func main() {
 	q.Add("prop", "extracts")
 	q.Add("exintro", "1")
 	q.Add("explaintext", "1")
+	q.Add("redirects", "1")
 	q.Add("titles", t)
 	req.URL.RawQuery = q.Encode()
 
