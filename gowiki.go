@@ -43,7 +43,7 @@ func main() {
 		fmt.Println("Wrong request. Exiting")
 		return
 	}
-	t := strings.Title(strings.Join(args," "))
+	t := strings.Join(args, " ")
 	for language := range languages {
 		query(t, languages[language], language)
 	}
